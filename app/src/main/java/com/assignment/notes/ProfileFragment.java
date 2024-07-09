@@ -1,5 +1,6 @@
 package com.assignment.notes;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -20,6 +21,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -60,30 +62,52 @@ public class ProfileFragment extends Fragment {
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                GoogleSignInClient mGoogleSignInClient ;
-                GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestIdToken(getString(R.string.default_web_client_id))
-                        .requestEmail()
-                        .build();
-                mGoogleSignInClient = GoogleSignIn.getClient(getActivity().getBaseContext(), gso);
-                mGoogleSignInClient.signOut().addOnCompleteListener(
-                        new OnCompleteListener<Void>() {
+
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext())
+                        .setTitle("Logout")
+                        .setMessage("Are you sure you want to logout?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                firebaseAuth.signOut();
-                                sessionManager.setLoggedIn(false);
-                                sessionManager.clearSession();
-                                //signout firebase
-                                Fragment fragment = new LoginFragment();
-                                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                                fragmentTransaction.replace(R.id.mainFrameLayout,fragment);
-                                fragmentTransaction.commit();
-                                Toast.makeText(getActivity().getBaseContext(), "Logged Out", Toast.LENGTH_LONG).show(); //if u want to show some text
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                logout();
+                                dialogInterface.dismiss();
+                            }
+                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
                             }
                         });
+                builder.create();
+                builder.show();
+
+            }
+
+            private void logout() {
+
+                    GoogleSignInClient mGoogleSignInClient ;
+                    GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                            .requestIdToken(getString(R.string.default_web_client_id))
+                            .requestEmail()
+                            .build();
+                    mGoogleSignInClient = GoogleSignIn.getClient(getActivity().getBaseContext(), gso);
+                    mGoogleSignInClient.signOut().addOnCompleteListener(
+                            new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    firebaseAuth.signOut();
+                                    sessionManager.setLoggedIn(false);
+                                    sessionManager.clearSession();
+                                    //signout firebase
+                                    Fragment fragment = new LoginFragment();
+                                    FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                                    fragmentTransaction.replace(R.id.mainFrameLayout,fragment);
+                                    fragmentTransaction.commit();
+                                    Toast.makeText(getActivity().getBaseContext(), "Logged Out", Toast.LENGTH_LONG).show(); //if u want to show some text
+                                }
+                            });
             }
         });
-        
+
         Toolbar toolbar =rootView.findViewById(R.id.profileToolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {

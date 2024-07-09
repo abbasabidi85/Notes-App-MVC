@@ -37,7 +37,7 @@
                 android:layout_height="170dp"
                 android:layout_gravity="center"
                 android:layout_weight="0.5"
-                android:src="@drawable/ic_profile"/>
+                android:src="@drawable/ic_blank_profile"/>
 
             <View
                 android:id="@+id/view3"
@@ -153,7 +153,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="4dp"
                                     app:cornerRadius="20dp"
-                                    android:text="Log Out"
+                                    android:text="Logout"
                                     app:icon="@drawable/ic_logout" />
                             </LinearLayout>
                         </LinearLayout>
