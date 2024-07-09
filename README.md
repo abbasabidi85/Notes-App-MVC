@@ -1,2 +1,2 @@
 App Screenshots
-![Notes App Screenshots -100](https://github.com/abbasabidi85/Notes_App/assets/75479506/5d4efc53-47f0-4e78-8071-883e362a26f4)
+![Notes App Screenshot-100](https://github.com/abbasabidi85/Notes_App/assets/75479506/5087a025-5bc8-4ed6-b66d-60dadc583d7d)
