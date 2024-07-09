@@ -90,7 +90,6 @@ public class AddNoteFragment extends Fragment {
                     documentReference.set(note).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            Toast.makeText(getContext(), "Note uploaded", Toast.LENGTH_SHORT).show();
                             getFragmentManager().popBackStackImmediate();
                         }
                     }).addOnFailureListener(new OnFailureListener() {
