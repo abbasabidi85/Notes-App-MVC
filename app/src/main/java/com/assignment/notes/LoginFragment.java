@@ -27,6 +27,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.Firebase;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -119,6 +120,7 @@ public class LoginFragment extends Fragment {
 
     private void firebaseAuth(String idToken) {
 
+        View v=getActivity().findViewById(R.id.fragmentLoginLayout);
         sessionManager = new SessionManager(getActivity().getApplicationContext());
         AuthCredential authCredential = GoogleAuthProvider.getCredential(idToken, null);
         firebaseAuth.signInWithCredential(authCredential)
@@ -143,10 +145,16 @@ public class LoginFragment extends Fragment {
                                 public void onSuccess(Void unused) {
 
                                     Fragment fragment = new HomeFragment();
-                                    FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                                    FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction()
+                                            .setCustomAnimations(
+                                                    R.anim.slide_in,  // enter
+                                                    R.anim.fade_out,  // exit
+                                                    R.anim.fade_in,   // popEnter
+                                                    R.anim.slide_out  // popExit
+                                            );
                                     fragmentTransaction.replace(R.id.mainFrameLayout,fragment);
                                     fragmentTransaction.commit();
-                                    Toast.makeText(getContext(), "Sign in successful", Toast.LENGTH_SHORT).show();
+                                    Snackbar.make(v,"Welcome back, " + firebaseAuth.getCurrentUser().getDisplayName(), Snackbar.LENGTH_SHORT).show();
 
                                 }
                             });
@@ -154,7 +162,7 @@ public class LoginFragment extends Fragment {
 
                         }
                         else {
-                            Toast.makeText(getActivity().getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                            Snackbar.make(v,"Something went wrong", Snackbar.LENGTH_SHORT).show();
                             sessionManager.setLoggedIn(false);
                         }
                     }

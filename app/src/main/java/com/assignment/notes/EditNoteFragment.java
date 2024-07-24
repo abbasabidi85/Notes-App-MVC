@@ -1,5 +1,7 @@
 package com.assignment.notes;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -11,12 +13,15 @@ import androidx.fragment.app.FragmentResultListener;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -33,6 +38,8 @@ public class EditNoteFragment extends Fragment {
     FloatingActionButton saveNoteFAB, deleteNoteFAB;
     FirebaseFirestore firebaseFirestore;
     FirebaseUser firebaseUser;
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -57,6 +64,11 @@ public class EditNoteFragment extends Fragment {
             }
         });
 
+        noteContent.requestFocus();
+        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+
+
         //get data from home fragment
         getParentFragmentManager().setFragmentResultListener("noteDetails", this, new FragmentResultListener() {
             @Override
@@ -74,7 +86,7 @@ public class EditNoteFragment extends Fragment {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                       title=documentSnapshot.getString("title");
-                        noteTitle.setText(title);
+                        noteTitle.append(title);
                     }
                 });
                 return title;
@@ -84,7 +96,7 @@ public class EditNoteFragment extends Fragment {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         content=documentSnapshot.getString("content");
-                        noteContent.setText(content);
+                        noteContent.append(content);
                     }
                 });
                 return content;
@@ -101,7 +113,7 @@ public class EditNoteFragment extends Fragment {
 
                 if (updatedTitle.isEmpty() || updatedContent.isEmpty()){
                     noteTitle.requestFocus();
-                    Toast.makeText(getContext(), "Both fields are required", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(rootView,"Both fields are required", Snackbar.LENGTH_SHORT).show();
                 }
                 else {
                     Map<String,Object> updatedNote=new HashMap<>();
@@ -110,13 +122,12 @@ public class EditNoteFragment extends Fragment {
                     documentReference.set(updatedNote).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            Toast.makeText(getContext(), "Note Updated", Toast.LENGTH_SHORT).show();
                             getFragmentManager().popBackStackImmediate();
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                            Snackbar.make(rootView,"Something went wrong", Snackbar.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -126,23 +137,48 @@ public class EditNoteFragment extends Fragment {
         deleteNoteFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext())
+                        .setTitle("Delete note")
+                        .setMessage("Are you sure you want to delete this note?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                deleteNote();
+                                dialogInterface.dismiss();
+                            }
+                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                            }
+                        });
+                builder.create();
+                builder.show();
+            }
+
+            private void deleteNote() {
                 DocumentReference documentReference=firebaseFirestore.collection("notes").document(firebaseUser.getUid()).collection("myNotes").document(docID);
                 documentReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
-                        Toast.makeText(getContext(), "Note deleted", Toast.LENGTH_SHORT).show();
+                        Snackbar.make(rootView,"Note deleted", Snackbar.LENGTH_SHORT).show();
                         getFragmentManager().popBackStackImmediate();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(getContext(), "Unable to delete", Toast.LENGTH_SHORT).show();
+                        Snackbar.make(rootView,"Unable to delete", Snackbar.LENGTH_SHORT).show();
                     }
                 });
-
             }
         });
 
         return rootView;
     }
+    @Override
+    public void onPause() {
+        super.onPause();
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(noteContent.getWindowToken(), 0);
+    }
+
 }

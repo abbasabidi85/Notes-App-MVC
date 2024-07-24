@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".AddNoteFragment">
+    tools:context=".AddNoteFragment"
+    android:id="@+id/fragmentEditLayout">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -20,7 +21,7 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
+            android:textSize="24sp"
             android:textStyle="bold"
             android:background="@null"
             android:paddingTop="20dp"

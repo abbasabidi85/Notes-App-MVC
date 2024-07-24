@@ -99,10 +99,15 @@ public class ProfileFragment extends Fragment {
                                     sessionManager.clearSession();
                                     //signout firebase
                                     Fragment fragment = new LoginFragment();
-                                    FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                                    FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction()
+                                            .setCustomAnimations(
+                                                    R.anim.slide_in,  // enter
+                                                    R.anim.fade_out,  // exit
+                                                    R.anim.fade_in,   // popEnter
+                                                    R.anim.slide_out  // popExit
+                                            );
                                     fragmentTransaction.replace(R.id.mainFrameLayout,fragment);
                                     fragmentTransaction.commit();
-                                    Toast.makeText(getActivity().getBaseContext(), "Logged Out", Toast.LENGTH_LONG).show(); //if u want to show some text
                                 }
                             });
             }

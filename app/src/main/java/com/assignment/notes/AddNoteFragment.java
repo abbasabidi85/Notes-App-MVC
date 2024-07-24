@@ -26,6 +26,7 @@ import androidx.appcompat.widget.Toolbar;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -56,7 +57,7 @@ public class AddNoteFragment extends Fragment {
         db=FirebaseFirestore.getInstance();
         firebaseUser=firebaseAuth.getCurrentUser();
 
-        mNoteContent.requestFocus();
+        mNoteTitle.requestFocus();
         InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
@@ -78,7 +79,7 @@ public class AddNoteFragment extends Fragment {
 
                 if (title.isEmpty() || content.isEmpty()){
                     mNoteTitle.requestFocus();
-                    Toast.makeText(getContext(), "Both fields are required", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(rootView,"Both fields are required", Snackbar.LENGTH_SHORT).show();
                 }
                 else {
                     //TODO
@@ -95,7 +96,7 @@ public class AddNoteFragment extends Fragment {
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                            Snackbar.make(rootView,"Something went wrong", Snackbar.LENGTH_SHORT).show();
                         }
                     });
 
@@ -106,6 +107,8 @@ public class AddNoteFragment extends Fragment {
 
         return rootView;
     }
+
+    
 
     @Override
     public void onPause() {

@@ -27,9 +27,11 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/note_title"
                     android:paddingHorizontal="10dp"
-                    android:paddingVertical="10dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="4dp"
+                    android:textStyle="bold"
                     android:text="Note Title"
-                    android:textSize="20sp"
+                    android:textSize="16sp"
                     android:layout_weight="1"
                     />
                 <ImageView
@@ -45,7 +47,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/note_content"
                 android:paddingHorizontal="10dp"
-                android:paddingVertical="10dp"
+                android:paddingBottom="10dp"
                 android:text="This is a sample text, which will appear in notes"
                 android:textSize="15sp"
                 />

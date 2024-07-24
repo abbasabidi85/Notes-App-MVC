@@ -1,5 +1,6 @@
 package com.assignment.notes;
 
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
 
@@ -29,8 +30,10 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.elevation.SurfaceColors;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -65,7 +68,6 @@ public class HomeFragment extends Fragment {
         toolbar=(MaterialToolbar) rootView.findViewById(R.id.toolbar);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
-        getActivity().getWindow().setNavigationBarColor(SurfaceColors.SURFACE_2.getColor(getContext()));
 
 
         ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
@@ -82,7 +84,13 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Fragment fragment = new AddNoteFragment();
-                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction()
+                        .setCustomAnimations(
+                                R.anim.slide_in,  // enter
+                                R.anim.fade_out,  // exit
+                                R.anim.fade_in,   // popEnter
+                                R.anim.slide_out  // popExit
+                        );;
                 fragmentTransaction.replace(R.id.mainFrameLayout,fragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
@@ -112,7 +120,13 @@ public class HomeFragment extends Fragment {
                                 Bundle result = new Bundle();
                                 result.putString("docID",docID);
                                 getParentFragmentManager().setFragmentResult("noteDetails",result);
-                                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction()
+                                        .setCustomAnimations(
+                                                R.anim.slide_in,  // enter
+                                                R.anim.fade_out,  // exit
+                                                R.anim.fade_in,   // popEnter
+                                                R.anim.slide_out  // popExit
+                                        );;
                                 fragmentTransaction.replace(R.id.mainFrameLayout,fragment);
                                 fragmentTransaction.addToBackStack(null);
                                 fragmentTransaction.commit();
@@ -123,18 +137,9 @@ public class HomeFragment extends Fragment {
                             @Override
                             public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
                                 //Toast.makeText(getContext(), "Note Deleted", Toast.LENGTH_SHORT).show();
-                                DocumentReference documentReference=firebaseFirestore.collection("notes").document(firebaseUser.getUid()).collection("myNotes").document(docID);
-                                documentReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        Toast.makeText(getContext(), "Note deleted", Toast.LENGTH_SHORT).show();
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(getContext(), "Failed to delete", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+
+                                deleteNote(docID);
+
                                 return false;
                             }
                         });
@@ -152,14 +157,50 @@ public class HomeFragment extends Fragment {
                         Bundle result = new Bundle();
                         result.putString("docID",docID);
                         getParentFragmentManager().setFragmentResult("noteDetails",result);
-                        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction()
+                        .setCustomAnimations(
+                                R.anim.slide_in,  // enter
+                                R.anim.fade_out,  // exit
+                                R.anim.fade_in,   // popEnter
+                                R.anim.slide_out  // popExit
+                        );
                         fragmentTransaction.replace(R.id.mainFrameLayout,fragment);
                         fragmentTransaction.addToBackStack(null);
                         fragmentTransaction.commit();
                     }
                 });
-            }
 
+
+            }
+            public void deleteNote(String docID){
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext())
+                        .setTitle("Delete note")
+                        .setMessage("Are you sure you want to delete this note?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                DocumentReference documentReference=firebaseFirestore.collection("notes").document(firebaseUser.getUid()).collection("myNotes").document(docID);
+                                documentReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        Snackbar.make(rootView,"Note deleted",Snackbar.LENGTH_SHORT).show();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Snackbar.make(rootView,"Failed to delete",Snackbar.LENGTH_SHORT).show();
+                                    }
+                                });
+                                dialogInterface.dismiss();
+                            }
+                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                            }
+                        });
+                builder.create();
+                builder.show();
+            }
             @NonNull
             @Override
             public NoteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -214,9 +255,14 @@ public class HomeFragment extends Fragment {
         int res_id= item.getItemId();
 
         if (res_id==R.id.action_profile){
-            Toast.makeText(getContext(), "Profile", Toast.LENGTH_SHORT).show();
             Fragment fragment = new ProfileFragment();
-            FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+            FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction()
+                    .setCustomAnimations(
+                            R.anim.slide_in,  // enter
+                            R.anim.fade_out,  // exit
+                            R.anim.fade_in,   // popEnter
+                            R.anim.slide_out  // popExit
+                    );;
             fragmentTransaction.replace(R.id.mainFrameLayout,fragment);
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
