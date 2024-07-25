@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -23,8 +24,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.assignment.notes.NotesAdapter;
 import com.assignment.notes.R;
+import com.assignment.notes.database.RoomDB;
 import com.assignment.notes.model.NoteModel;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
@@ -36,24 +40,32 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 
-public class HomeFragment extends Fragment {
+import java.util.ArrayList;
+import java.util.List;
+
+public class HomeFragment extends Fragment implements NotesAdapter.NoteListClickListener {
 
     MaterialToolbar toolbar;
     FloatingActionButton fabAdd;
 
-    private FirebaseAuth firebaseAuth;
-
     RecyclerView mRecyclerView;
     StaggeredGridLayoutManager mStaggeredGridLayoutManager;
+    NotesAdapter notesAdapter;
 
     FirebaseUser firebaseUser;
     FirebaseFirestore firebaseFirestore;
 
-    FirestoreRecyclerAdapter<NoteModel,NoteViewHolder> noteAdapter;
+    CollectionReference collectionReference;
+    RoomDB database;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
@@ -61,9 +73,9 @@ public class HomeFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
 
-        firebaseAuth=FirebaseAuth.getInstance();
         firebaseUser=FirebaseAuth.getInstance().getCurrentUser();
         firebaseFirestore=FirebaseFirestore.getInstance();
+        collectionReference=firebaseFirestore.collection("notes").document(firebaseUser.getUid()).collection("myNotes");
 
         toolbar=(MaterialToolbar) rootView.findViewById(R.id.toolbar);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
@@ -97,138 +109,43 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        Query query=firebaseFirestore.collection("notes").document(firebaseUser.getUid()).collection("myNotes").orderBy("title", Query.Direction.DESCENDING);
-        FirestoreRecyclerOptions<NoteModel> allUserNotes= new FirestoreRecyclerOptions.Builder<NoteModel>().setQuery(query, NoteModel.class).build();
-
-        noteAdapter=new FirestoreRecyclerAdapter<NoteModel, NoteViewHolder>(allUserNotes) {
-            @Override
-            protected void onBindViewHolder(@NonNull NoteViewHolder noteViewHolder, int i, @NonNull NoteModel noteModel) {
-
-                String docID=noteAdapter.getSnapshots().getSnapshot(i).getId();
-                ImageView popUpButton=noteViewHolder.itemView.findViewById(R.id.menuPopButton);
-
-                popUpButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        PopupMenu popupMenu = new PopupMenu(getContext(),view);
-                        popupMenu.setGravity(Gravity.END);
-                        popupMenu.getMenu().add("Edit").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                            @Override
-                            public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
-
-                                Fragment fragment = new EditNoteFragment();
-                                Bundle result = new Bundle();
-                                result.putString("docID",docID);
-                                getParentFragmentManager().setFragmentResult("noteDetails",result);
-                                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction()
-                                        .setCustomAnimations(
-                                                R.anim.slide_in,  // enter
-                                                R.anim.fade_out,  // exit
-                                                R.anim.fade_in,   // popEnter
-                                                R.anim.slide_out  // popExit
-                                        );;
-                                fragmentTransaction.replace(R.id.mainFrameLayout,fragment);
-                                fragmentTransaction.addToBackStack(null);
-                                fragmentTransaction.commit();
-                                return false;
-                            }
-                        });
-                        popupMenu.getMenu().add("Delete").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                            @Override
-                            public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
-                                //Toast.makeText(getContext(), "Note Deleted", Toast.LENGTH_SHORT).show();
-
-                                deleteNote(docID);
-
-                                return false;
-                            }
-                        });
-                        popupMenu.show();
-                    }
-                });
-
-                noteViewHolder.noteTitle.setText(noteModel.getTitle());
-                noteViewHolder.noteContent.setText(noteModel.getContent());
-                noteViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-                        Fragment fragment = new EditNoteFragment();
-                        Bundle result = new Bundle();
-                        result.putString("docID",docID);
-                        getParentFragmentManager().setFragmentResult("noteDetails",result);
-                        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction()
-                        .setCustomAnimations(
-                                R.anim.slide_in,  // enter
-                                R.anim.fade_out,  // exit
-                                R.anim.fade_in,   // popEnter
-                                R.anim.slide_out  // popExit
-                        );
-                        fragmentTransaction.replace(R.id.mainFrameLayout,fragment);
-                        fragmentTransaction.addToBackStack(null);
-                        fragmentTransaction.commit();
-                    }
-                });
-
-
-            }
-            public void deleteNote(String docID){
-                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext())
-                        .setTitle("Delete note")
-                        .setMessage("Are you sure you want to delete this note?")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                DocumentReference documentReference=firebaseFirestore.collection("notes").document(firebaseUser.getUid()).collection("myNotes").document(docID);
-                                documentReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        Snackbar.make(rootView,"Note deleted",Snackbar.LENGTH_SHORT).show();
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Snackbar.make(rootView,"Failed to delete",Snackbar.LENGTH_SHORT).show();
-                                    }
-                                });
-                                dialogInterface.dismiss();
-                            }
-                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                            }
-                        });
-                builder.create();
-                builder.show();
-            }
-            @NonNull
-            @Override
-            public NoteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-               View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.notes_layout,parent,false);
-               return new NoteViewHolder(view);
-            }
-        };
-
         mRecyclerView=(RecyclerView) rootView.findViewById(R.id.recyclerView);
-        mStaggeredGridLayoutManager= new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
-        mRecyclerView.setLayoutManager(mStaggeredGridLayoutManager);
-        mRecyclerView.setAdapter(noteAdapter);
+        setupRecyclerView();
 
         return rootView;
     }
 
-    public class NoteViewHolder extends RecyclerView.ViewHolder{
+    private void setupRecyclerView() {
+        Query query=collectionReference.orderBy("title", Query.Direction.DESCENDING);
+        FirestoreRecyclerOptions<NoteModel> options = new FirestoreRecyclerOptions.Builder<NoteModel>()
+                .setQuery(query, NoteModel.class).build();
+        mStaggeredGridLayoutManager= new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        mRecyclerView.setLayoutManager(mStaggeredGridLayoutManager);
+        notesAdapter= new NotesAdapter(options,getContext(),this);
+        mRecyclerView.setAdapter(notesAdapter);
+    }
 
-        private TextView noteTitle;
-        private TextView noteContent;
-        LinearLayout mNote;
+    @Override
+    public void onClickItem(String docID, String noteTitle, String noteContent) {
 
-        public NoteViewHolder(@NonNull View itemView) {
-            super(itemView);
-            noteTitle=itemView.findViewById(R.id.note_title);
-            noteContent=itemView.findViewById(R.id.note_content);
-            mNote=itemView.findViewById(R.id.note_linear_layout);
-        }
+        Fragment fragment = new EditNoteFragment();
+        Bundle result = new Bundle();
+        result.putString("docID",docID);
+        result.putString("title", noteTitle);
+        result.putString("content", noteContent);
+        getParentFragmentManager().setFragmentResult("noteDetails",result);
+        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(
+                        R.anim.slide_in,  // enter
+                        R.anim.fade_out,  // exit
+                        R.anim.fade_in,   // popEnter
+                        R.anim.slide_out  // popExit
+                );
+        fragmentTransaction.replace(R.id.mainFrameLayout,fragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+
+        //Toast.makeText(getContext(), docID, Toast.LENGTH_SHORT).show();
     }
 
     public boolean isDarkModeEnabled() {
@@ -269,10 +186,23 @@ public class HomeFragment extends Fragment {
         }
         return true;
     }
+
     
     @Override
     public void onStart() {
         super.onStart();
-        noteAdapter.startListening();
+        notesAdapter.startListening();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        notesAdapter.stopListening();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        notesAdapter.notifyDataSetChanged();
     }
 }

@@ -52,7 +52,7 @@ public class AddNoteFragment extends Fragment {
 
         mNoteTitle.requestFocus();
         InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
 
         Toolbar toolbar =rootView.findViewById(R.id.addNoteToolbar);
@@ -84,7 +84,7 @@ public class AddNoteFragment extends Fragment {
                     documentReference.set(newNote).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            getFragmentManager().popBackStackImmediate();
+
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
@@ -92,6 +92,7 @@ public class AddNoteFragment extends Fragment {
                             Snackbar.make(rootView,"Something went wrong", Snackbar.LENGTH_SHORT).show();
                         }
                     });
+                    getFragmentManager().popBackStackImmediate();
 
                 }
             }
@@ -99,14 +100,5 @@ public class AddNoteFragment extends Fragment {
 
 
         return rootView;
-    }
-
-    
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(mNoteContent.getWindowToken(), 0);
     }
 }

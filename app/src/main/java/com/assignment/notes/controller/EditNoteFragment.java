@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.assignment.notes.R;
 import com.assignment.notes.model.NoteModel;
@@ -28,13 +29,10 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.HashMap;
-import java.util.Map;
-
 
 public class EditNoteFragment extends Fragment {
-    String docID, noteTitleText, noteContentText, title, content;
-    EditText noteTitle, noteContent;
+    String docID, noteTitle, noteContent;
+    EditText noteTitleEditText, noteContentEditText;
     FloatingActionButton saveNoteFAB, deleteNoteFAB;
     FirebaseFirestore firebaseFirestore;
     FirebaseUser firebaseUser;
@@ -47,8 +45,8 @@ public class EditNoteFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView =inflater.inflate(R.layout.fragment_edit_note, container, false);
 
-        noteTitle=(EditText) rootView.findViewById(R.id.editNoteTitle);
-        noteContent=(EditText) rootView.findViewById(R.id.editNoteContent);
+        noteTitleEditText=(EditText) rootView.findViewById(R.id.editNoteTitle);
+        noteContentEditText=(EditText) rootView.findViewById(R.id.editNoteContent);
         saveNoteFAB=(FloatingActionButton) rootView.findViewById(R.id.editNoteFab);
         deleteNoteFAB=(FloatingActionButton) rootView.findViewById(R.id.deleteNotefab);
 
@@ -64,7 +62,7 @@ public class EditNoteFragment extends Fragment {
             }
         });
 
-        noteContent.requestFocus();
+        noteContentEditText.requestFocus();
         InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
@@ -74,32 +72,12 @@ public class EditNoteFragment extends Fragment {
             @Override
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
                 docID=result.getString("docID");
-                DocumentReference documentReference=firebaseFirestore.collection("notes").document(firebaseUser.getUid()).collection("myNotes").document(docID);
+                noteTitle= result.getString("title");
+                noteContent= result.getString("content");
 
-                getTitleText(documentReference);
-                getContentText(documentReference);
-            }
+                noteTitleEditText.append(noteTitle);
+                noteContentEditText.append(noteContent);
 
-            //get Title and content text from document snapshot
-            private String getTitleText(DocumentReference documentReference) {
-                documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                      title=documentSnapshot.getString("title");
-                        noteTitle.append(title);
-                    }
-                });
-                return title;
-            }
-            private String getContentText(DocumentReference documentReference) {
-                documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        content=documentSnapshot.getString("content");
-                        noteContent.append(content);
-                    }
-                });
-                return content;
             }
         });
 
@@ -108,11 +86,11 @@ public class EditNoteFragment extends Fragment {
             public void onClick(View view) {
                 DocumentReference documentReference=firebaseFirestore.collection("notes").document(firebaseUser.getUid()).collection("myNotes").document(docID);
 
-                String updatedTitle=noteTitle.getText().toString();
-                String updatedContent=noteContent.getText().toString();
+                String updatedTitle=noteTitleEditText.getText().toString();
+                String updatedContent=noteContentEditText.getText().toString();
 
                 if (updatedTitle.isEmpty() || updatedContent.isEmpty()){
-                    noteTitle.requestFocus();
+                    noteTitleEditText.requestFocus();
                     Snackbar.make(rootView,"Both fields are required", Snackbar.LENGTH_SHORT).show();
                 }
                 else {
@@ -123,7 +101,7 @@ public class EditNoteFragment extends Fragment {
                     documentReference.set(updatedNote).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            getFragmentManager().popBackStackImmediate();
+
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
@@ -131,6 +109,7 @@ public class EditNoteFragment extends Fragment {
                             Snackbar.make(rootView,"Something went wrong", Snackbar.LENGTH_SHORT).show();
                         }
                     });
+                    getFragmentManager().popBackStackImmediate();
                 }
             }
         });
@@ -162,7 +141,6 @@ public class EditNoteFragment extends Fragment {
                     @Override
                     public void onSuccess(Void unused) {
                         Snackbar.make(rootView,"Note deleted", Snackbar.LENGTH_SHORT).show();
-                        getFragmentManager().popBackStackImmediate();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -170,6 +148,7 @@ public class EditNoteFragment extends Fragment {
                         Snackbar.make(rootView,"Unable to delete", Snackbar.LENGTH_SHORT).show();
                     }
                 });
+                getFragmentManager().popBackStackImmediate();
             }
         });
 
@@ -179,7 +158,7 @@ public class EditNoteFragment extends Fragment {
     public void onPause() {
         super.onPause();
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(noteContent.getWindowToken(), 0);
+        imm.hideSoftInputFromWindow(noteContentEditText.getWindowToken(), 0);
     }
 
 }
