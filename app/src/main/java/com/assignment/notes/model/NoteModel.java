@@ -7,34 +7,20 @@ import androidx.room.PrimaryKey;
 
 import java.io.Serializable;
 
-@Entity(tableName = "notes")
-public class NoteModel implements Serializable {
+public class NoteModel {
 
-    @PrimaryKey(autoGenerate = true)
-    private int ID=0;
 
-    @ColumnInfo(name = "title")
     private String title;
 
-    @ColumnInfo(name = "content")
     private String content;
 
     public NoteModel(){
 
     }
 
-    public NoteModel(int ID, String docID, String title, String content){
-        this.ID=ID;
+    public NoteModel(String title, String content){
         this.title=title;
         this.content=content;
-    }
-
-    public int getID() {
-        return ID;
-    }
-
-    public void setID(int ID) {
-        this.ID = ID;
     }
 
     public String getTitle() {

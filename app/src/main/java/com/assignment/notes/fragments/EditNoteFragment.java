@@ -1,4 +1,4 @@
-package com.assignment.notes.controller;
+package com.assignment.notes.fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.assignment.notes.R;
 import com.assignment.notes.model.NoteModel;
@@ -26,7 +25,6 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 

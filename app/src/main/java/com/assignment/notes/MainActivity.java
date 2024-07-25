@@ -1,4 +1,4 @@
-package com.assignment.notes.controller;
+package com.assignment.notes;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -14,8 +14,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 
-import com.assignment.notes.R;
-import com.assignment.notes.SessionManager;
+import com.assignment.notes.auth.SessionManager;
+import com.assignment.notes.fragments.LoginFragment;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.material.appbar.MaterialToolbar;

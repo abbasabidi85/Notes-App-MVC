@@ -7,13 +7,13 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.assignment.notes.controller.HomeFragment"
+        android:name="com.assignment.notes.fragments.HomeFragment"
         android:label="Home"
         tools:layout="@layout/fragment_home"/>
 
     <fragment
         android:id="@+id/navigation_profile"
-        android:name="com.assignment.notes.controller.ProfileFragment"
+        android:name="com.assignment.notes.fragments.ProfileFragment"
         android:label="Profile"
         tools:layout="@layout/fragment_profile"/>
 

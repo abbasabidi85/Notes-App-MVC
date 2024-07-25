@@ -1,4 +1,4 @@
-package com.assignment.notes.controller;
+package com.assignment.notes.fragments;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.assignment.notes.R;
-import com.assignment.notes.SessionManager;
+import com.assignment.notes.auth.SessionManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;

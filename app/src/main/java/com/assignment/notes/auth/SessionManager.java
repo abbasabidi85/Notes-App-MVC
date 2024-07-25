@@ -1,4 +1,4 @@
-package com.assignment.notes;
+package com.assignment.notes.auth;
 
 import android.content.Context;
 import android.content.SharedPreferences;
