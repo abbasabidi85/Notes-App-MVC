@@ -1,8 +1,4 @@
-package com.assignment.notes;
-
-import static android.content.ContentValues.TAG;
-
-import static androidx.core.content.ContextCompat.getSystemService;
+package com.assignment.notes.controller;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -10,19 +6,16 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import android.os.SystemClock;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 
+import com.assignment.notes.R;
+import com.assignment.notes.model.NoteModel;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -83,12 +76,12 @@ public class AddNoteFragment extends Fragment {
                 }
                 else {
                     //TODO
-                    Map<String, Object> note = new HashMap<>();
-                    note.put("title", title);
-                    note.put("content", content);
+                    NoteModel newNote = new NoteModel();
+                    newNote.setTitle(title);
+                    newNote.setContent(content);
 
                     DocumentReference documentReference=db.collection("notes").document(firebaseUser.getUid()).collection("myNotes").document();
-                    documentReference.set(note).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    documentReference.set(newNote).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
                             getFragmentManager().popBackStackImmediate();

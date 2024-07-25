@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LoginFragment"
+    tools:context=".controller.LoginFragment"
     android:id="@+id/fragmentLoginLayout">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/loginLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".MainActivity">
+        tools:context=".controller.MainActivity">
 
         <TextView
             android:id="@+id/welcomeText"

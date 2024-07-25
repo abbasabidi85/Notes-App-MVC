@@ -1,14 +1,14 @@
-package com.assignment.notes;
+package com.assignment.notes.model;
 
-public class RecyclerModel {
+public class NoteModel {
     private String title;
     private String content;
 
-    public RecyclerModel(){
+    public NoteModel(){
 
     }
 
-    public RecyclerModel(String title, String content){
+    public NoteModel(String title, String content){
         this.title=title;
         this.content=content;
     }

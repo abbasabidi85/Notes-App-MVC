@@ -1,4 +1,4 @@
-package com.assignment.notes;
+package com.assignment.notes.controller;
 
 import android.content.DialogInterface;
 import android.content.res.Configuration;
@@ -23,15 +23,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.assignment.notes.R;
+import com.assignment.notes.model.NoteModel;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.elevation.SurfaceColors;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -53,7 +53,7 @@ public class HomeFragment extends Fragment {
     FirebaseUser firebaseUser;
     FirebaseFirestore firebaseFirestore;
 
-    FirestoreRecyclerAdapter<RecyclerModel,NoteViewHolder> noteAdapter;
+    FirestoreRecyclerAdapter<NoteModel,NoteViewHolder> noteAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
@@ -98,11 +98,11 @@ public class HomeFragment extends Fragment {
         });
 
         Query query=firebaseFirestore.collection("notes").document(firebaseUser.getUid()).collection("myNotes").orderBy("title", Query.Direction.DESCENDING);
-        FirestoreRecyclerOptions<RecyclerModel> allUserNotes= new FirestoreRecyclerOptions.Builder<RecyclerModel>().setQuery(query,RecyclerModel.class).build();
+        FirestoreRecyclerOptions<NoteModel> allUserNotes= new FirestoreRecyclerOptions.Builder<NoteModel>().setQuery(query, NoteModel.class).build();
 
-        noteAdapter=new FirestoreRecyclerAdapter<RecyclerModel, NoteViewHolder>(allUserNotes) {
+        noteAdapter=new FirestoreRecyclerAdapter<NoteModel, NoteViewHolder>(allUserNotes) {
             @Override
-            protected void onBindViewHolder(@NonNull NoteViewHolder noteViewHolder, int i, @NonNull RecyclerModel recyclerModel) {
+            protected void onBindViewHolder(@NonNull NoteViewHolder noteViewHolder, int i, @NonNull NoteModel noteModel) {
 
                 String docID=noteAdapter.getSnapshots().getSnapshot(i).getId();
                 ImageView popUpButton=noteViewHolder.itemView.findViewById(R.id.menuPopButton);
@@ -147,8 +147,8 @@ public class HomeFragment extends Fragment {
                     }
                 });
 
-                noteViewHolder.noteTitle.setText(recyclerModel.getTitle());
-                noteViewHolder.noteContent.setText(recyclerModel.getContent());
+                noteViewHolder.noteTitle.setText(noteModel.getTitle());
+                noteViewHolder.noteContent.setText(noteModel.getContent());
                 noteViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
