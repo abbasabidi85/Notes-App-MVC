@@ -52,7 +52,6 @@ public class HomeFragment extends Fragment implements NotesAdapter.NoteListClick
 
         firebaseUser=FirebaseAuth.getInstance().getCurrentUser();
         firebaseFirestore=FirebaseFirestore.getInstance();
-        collectionReference=firebaseFirestore.collection("notes").document(firebaseUser.getUid()).collection("myNotes");
 
         toolbar=(MaterialToolbar) rootView.findViewById(R.id.toolbar);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
@@ -72,6 +71,7 @@ public class HomeFragment extends Fragment implements NotesAdapter.NoteListClick
         fabAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 Fragment fragment = new AddNoteFragment();
                 FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction()
                         .setCustomAnimations(
@@ -93,6 +93,7 @@ public class HomeFragment extends Fragment implements NotesAdapter.NoteListClick
     }
 
     private void setupRecyclerView() {
+        collectionReference=firebaseFirestore.collection("notes").document(firebaseUser.getUid()).collection("myNotes");
         Query query=collectionReference.orderBy("title", Query.Direction.DESCENDING);
         FirestoreRecyclerOptions<NoteModel> options = new FirestoreRecyclerOptions.Builder<NoteModel>()
                 .setQuery(query, NoteModel.class).build();
@@ -118,6 +119,7 @@ public class HomeFragment extends Fragment implements NotesAdapter.NoteListClick
                         R.anim.fade_in,   // popEnter
                         R.anim.slide_out  // popExit
                 );
+
         fragmentTransaction.replace(R.id.mainFrameLayout,fragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();

@@ -4,8 +4,10 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.view.LayoutInflater;
@@ -80,6 +82,9 @@ public class ProfileFragment extends Fragment {
 
             private void logout() {
 
+                    //clear the backstack here before calling logout methods so that any fragment will not be listening to firebase
+                    getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
                     GoogleSignInClient mGoogleSignInClient ;
                     GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                             .requestIdToken(getString(R.string.default_web_client_id))
@@ -90,10 +95,11 @@ public class ProfileFragment extends Fragment {
                             new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
+                                    //signout firebase
                                     firebaseAuth.signOut();
                                     sessionManager.setLoggedIn(false);
                                     sessionManager.clearSession();
-                                    //signout firebase
+
                                     Fragment fragment = new LoginFragment();
                                     FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction()
                                             .setCustomAnimations(
