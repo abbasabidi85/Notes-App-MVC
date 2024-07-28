@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentResultListener;
@@ -16,6 +18,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.assignment.notes.R;
+import com.assignment.notes.model.SaveNote;
 import com.assignment.notes.model.NoteModel;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -28,7 +31,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 
-public class EditNoteFragment extends Fragment {
+public class EditNoteFragment extends Fragment implements SaveNote {
     String docID, noteTitle, noteContent;
     EditText noteTitleEditText, noteContentEditText;
     FloatingActionButton saveNoteFAB, deleteNoteFAB;
@@ -82,33 +85,21 @@ public class EditNoteFragment extends Fragment {
         saveNoteFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DocumentReference documentReference=firebaseFirestore.collection("notes").document(firebaseUser.getUid()).collection("myNotes").document(docID);
 
                 String updatedTitle=noteTitleEditText.getText().toString();
                 String updatedContent=noteContentEditText.getText().toString();
-
-                if (updatedTitle.isEmpty() || updatedContent.isEmpty()){
-                    noteTitleEditText.requestFocus();
-                    Snackbar.make(rootView,"Both fields are required", Snackbar.LENGTH_SHORT).show();
-                }
-                else {
-                    NoteModel updatedNote = new NoteModel();
-                    updatedNote.setTitle(updatedTitle);
-                    updatedNote.setContent(updatedContent);
-
-                    documentReference.set(updatedNote).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void unused) {
-
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Snackbar.make(rootView,"Something went wrong", Snackbar.LENGTH_SHORT).show();
-                        }
-                    });
+                if (updatedTitle.equals(noteTitle) && updatedContent.equals(noteContent)){
                     getFragmentManager().popBackStackImmediate();
+                }else if (updatedTitle.isEmpty()||updatedContent.isEmpty()){
+                    Snackbar.make(getView(),"Empty note discarded", Snackbar.LENGTH_SHORT).show();
+                    getFragmentManager().popBackStackImmediate();
+                }else {
+                    saveNote(docID, updatedTitle, updatedContent);
                 }
+
+
+
+
             }
         });
 
@@ -158,5 +149,57 @@ public class EditNoteFragment extends Fragment {
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(noteContentEditText.getWindowToken(), 0);
     }
+    //save note on pressing back button
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if(noteTitleEditText.getText().toString().equals(noteTitle) && noteContentEditText.getText().toString().equals(noteContent)){
 
+                }else if (noteTitleEditText.getText().toString().isEmpty() || noteContentEditText.getText().toString().isEmpty()){
+
+                }else{
+                    onBackSaveNote();
+                }
+
+                setEnabled(false); // Disable the callback after handling
+                requireActivity().onBackPressed(); // Call the activity's back pressed method
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), callback);
+    }
+
+    private void onBackSaveNote() {
+        String updatedTitle=noteTitleEditText.getText().toString();
+        String updatedContent=noteContentEditText.getText().toString();
+        saveNote(docID,updatedTitle,updatedContent);
+    }
+
+    @Override
+    public void saveNote(String docID, String updatedTitle, String updatedContent) {
+        DocumentReference documentReference=firebaseFirestore.collection("notes").document(firebaseUser.getUid()).collection("myNotes").document(docID);
+
+            NoteModel updatedNote = new NoteModel();
+            updatedNote.setTitle(updatedTitle);
+            updatedNote.setContent(updatedContent);
+
+            documentReference.set(updatedNote).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void unused) {
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Snackbar.make(getView(),"Something went wrong", Snackbar.LENGTH_SHORT).show();
+                }
+            });
+            getFragmentManager().popBackStackImmediate();
+    }
+
+    @Override
+    public void uploadNote(String title, String content) {
+    }
 }

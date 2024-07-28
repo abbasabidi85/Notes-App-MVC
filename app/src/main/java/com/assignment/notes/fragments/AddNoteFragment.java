@@ -3,7 +3,9 @@ package com.assignment.notes.fragments;
 import android.content.Context;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -15,6 +17,7 @@ import android.widget.EditText;
 import androidx.appcompat.widget.Toolbar;
 
 import com.assignment.notes.R;
+import com.assignment.notes.model.SaveNote;
 import com.assignment.notes.model.NoteModel;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -25,7 +28,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class AddNoteFragment extends Fragment {
+public class AddNoteFragment extends Fragment implements SaveNote {
 
     EditText mNoteTitle, mNoteContent;
     FloatingActionButton fabUploadNote;
@@ -64,38 +67,82 @@ public class AddNoteFragment extends Fragment {
         fabUploadNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 String title = mNoteTitle.getText().toString();
                 String content=mNoteContent.getText().toString();
 
-                if (title.isEmpty() || content.isEmpty()){
-                    mNoteTitle.requestFocus();
-                    Snackbar.make(rootView,"Both fields are required", Snackbar.LENGTH_SHORT).show();
-                }
-                else {
-                    //TODO
-                    NoteModel newNote = new NoteModel();
-                    newNote.setTitle(title);
-                    newNote.setContent(content);
+                uploadNote(title, content);
 
-                    DocumentReference documentReference=db.collection("notes").document(firebaseUser.getUid()).collection("myNotes").document();
-                    documentReference.set(newNote).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void unused) {
-
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Snackbar.make(rootView,"Something went wrong", Snackbar.LENGTH_SHORT).show();
-                        }
-                    });
-                    getFragmentManager().popBackStackImmediate();
-
-                }
             }
         });
 
 
         return rootView;
+
+    }
+
+    //save note on pressing back button
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (mNoteTitle.getText().toString().isEmpty() || mNoteContent.getText().toString().isEmpty()){
+                    Snackbar.make(getView(),"Empty note discarded",Snackbar.LENGTH_SHORT).show();
+                }else {
+                    String title = mNoteTitle.getText().toString();
+                    String content=mNoteContent.getText().toString();
+                    uploadNote(title,content);
+                    getFragmentManager().popBackStackImmediate();
+                }
+
+                setEnabled(false); // Disable the callback after handling
+                requireActivity().onBackPressed(); // Call the activity's back pressed method
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), callback);
+    }
+
+
+
+
+
+
+
+
+
+    @Override
+    public void uploadNote(String title, String content) {
+
+        if (title.isEmpty() || content.isEmpty()){
+            Snackbar.make(getView(),"Empty note discarded", Snackbar.LENGTH_SHORT).show();
+            getFragmentManager().popBackStackImmediate();
+        }
+        else {
+            NoteModel newNote = new NoteModel();
+            newNote.setTitle(title);
+            newNote.setContent(content);
+
+            DocumentReference documentReference=db.collection("notes").document(firebaseUser.getUid()).collection("myNotes").document();
+            documentReference.set(newNote).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void unused) {
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Snackbar.make(getView(),"Something went wrong", Snackbar.LENGTH_SHORT).show();
+                }
+            });
+
     }
 }
+
+    @Override
+    public void saveNote(String docID, String title, String content) {
+
+    }
+}
+
