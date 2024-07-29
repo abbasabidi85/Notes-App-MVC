@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.appcompat.widget.Toolbar;
 
@@ -21,6 +22,7 @@ import com.assignment.notes.model.SaveNote;
 import com.assignment.notes.model.NoteModel;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,8 +30,13 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class AddNoteFragment extends Fragment implements SaveNote {
 
+    String formattedDateTime;
+    TextView dateTime;
     EditText mNoteTitle, mNoteContent;
     FloatingActionButton fabUploadNote;
     FirebaseAuth firebaseAuth;
@@ -42,9 +49,10 @@ public class AddNoteFragment extends Fragment implements SaveNote {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_add_note, container, false);
 
+        dateTime=rootView.findViewById(R.id.addNoteDateTime);
         mNoteTitle=rootView.findViewById(R.id.addNoteTitle);
         mNoteContent=rootView.findViewById(R.id.addNoteContent);
-        fabUploadNote=(FloatingActionButton) rootView.findViewById(R.id.addNotFab);
+        //fabUploadNote=(FloatingActionButton) rootView.findViewById(R.id.addNotFab);
 
         firebaseAuth = FirebaseAuth.getInstance();
         db=FirebaseFirestore.getInstance();
@@ -55,7 +63,7 @@ public class AddNoteFragment extends Fragment implements SaveNote {
         imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
 
-        Toolbar toolbar =rootView.findViewById(R.id.addNoteToolbar);
+        Toolbar toolbar =(Toolbar) rootView.findViewById(R.id.addNoteToolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,7 +72,7 @@ public class AddNoteFragment extends Fragment implements SaveNote {
             }
         });
 
-        fabUploadNote.setOnClickListener(new View.OnClickListener() {
+        /* fabUploadNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -74,7 +82,19 @@ public class AddNoteFragment extends Fragment implements SaveNote {
                 uploadNote(title, content);
 
             }
-        });
+        }); */
+
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            LocalDateTime now = LocalDateTime.now();
+            // Define the desired format
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+            // Format the current date and time
+            formattedDateTime = now.format(formatter);
+        }
+
+        dateTime.setText(formattedDateTime);
 
 
         return rootView;
@@ -88,13 +108,13 @@ public class AddNoteFragment extends Fragment implements SaveNote {
         OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                if (mNoteTitle.getText().toString().isEmpty() || mNoteContent.getText().toString().isEmpty()){
+                if (mNoteTitle.getText().toString().isEmpty() && mNoteContent.getText().toString().isEmpty()){
                     Snackbar.make(getView(),"Empty note discarded",Snackbar.LENGTH_SHORT).show();
                 }else {
+                    String dateTime=formattedDateTime;
                     String title = mNoteTitle.getText().toString();
                     String content=mNoteContent.getText().toString();
-                    uploadNote(title,content);
-                    getFragmentManager().popBackStackImmediate();
+                    uploadNote(dateTime,title,content);
                 }
 
                 setEnabled(false); // Disable the callback after handling
@@ -113,14 +133,14 @@ public class AddNoteFragment extends Fragment implements SaveNote {
 
 
     @Override
-    public void uploadNote(String title, String content) {
+    public void uploadNote(String formattedDateTime, String title, String content) {
 
-        if (title.isEmpty() || content.isEmpty()){
+        if (title.isEmpty() && content.isEmpty()){
             Snackbar.make(getView(),"Empty note discarded", Snackbar.LENGTH_SHORT).show();
-            getFragmentManager().popBackStackImmediate();
         }
         else {
             NoteModel newNote = new NoteModel();
+            newNote.setDateTime(formattedDateTime);
             newNote.setTitle(title);
             newNote.setContent(content);
 
@@ -141,7 +161,7 @@ public class AddNoteFragment extends Fragment implements SaveNote {
 }
 
     @Override
-    public void saveNote(String docID, String title, String content) {
+    public void saveNote(String updatedDateTime, String docID, String title, String content) {
 
     }
 }

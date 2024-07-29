@@ -18,23 +18,26 @@ public class NotesAdapter extends FirestoreRecyclerAdapter<NoteModel, NotesAdapt
 
     Context context;
     NoteListClickListener noteListClickListener;
+    CheckIfEmpty isAdapterEmpty;
 
-    public NotesAdapter(@NonNull FirestoreRecyclerOptions<NoteModel> options, Context context, NoteListClickListener noteListClickListener) {
+    public NotesAdapter(@NonNull FirestoreRecyclerOptions<NoteModel> options, Context context, NoteListClickListener noteListClickListener, CheckIfEmpty isAdapterEmpty) {
         super(options);
         this.context=context;
         this.noteListClickListener=noteListClickListener;
+        this.isAdapterEmpty=isAdapterEmpty;
     }
 
     @Override
     protected void onBindViewHolder(@NonNull NotesViewHolder holder, int position, @NonNull NoteModel noteModel) {
 
         String docID=this.getSnapshots().getSnapshot(position).getId();
+        String dateTime=this.getSnapshots().getSnapshot(position).getString("dateTime");
         holder.noteTitle.setText(noteModel.getTitle());
         holder.noteContent.setText(noteModel.getContent());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                noteListClickListener.onClickItem(docID, noteModel.getTitle(), noteModel.getContent());
+                noteListClickListener.onClickItem(dateTime, docID, noteModel.getTitle(), noteModel.getContent());
             }
         });
     }
@@ -85,7 +88,18 @@ public class NotesAdapter extends FirestoreRecyclerAdapter<NoteModel, NotesAdapt
         }
     }
 
+    @Override
+    public void onDataChanged() {
+        super.onDataChanged();
+        isAdapterEmpty.isAdapterEmpty();
+
+    }
+
+    public interface CheckIfEmpty {
+        void isAdapterEmpty();
+    }
+
     public interface NoteListClickListener{
-        void onClickItem(String docID,String noteTitle, String noteContent);
+        void onClickItem(String dateTime, String docID,String noteTitle, String noteContent);
     }
 }

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,6 +18,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.assignment.notes.adapter.NotesAdapter;
 import com.assignment.notes.R;
@@ -30,11 +33,12 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
-public class HomeFragment extends Fragment implements NotesAdapter.NoteListClickListener {
+public class HomeFragment extends Fragment implements NotesAdapter.NoteListClickListener, NotesAdapter.CheckIfEmpty{
 
-    MaterialToolbar toolbar;
+    Toolbar toolbar;
     FloatingActionButton fabAdd;
 
+    TextView noNotes;
     RecyclerView mRecyclerView;
     StaggeredGridLayoutManager mStaggeredGridLayoutManager;
     NotesAdapter notesAdapter;
@@ -52,8 +56,8 @@ public class HomeFragment extends Fragment implements NotesAdapter.NoteListClick
 
         firebaseUser=FirebaseAuth.getInstance().getCurrentUser();
         firebaseFirestore=FirebaseFirestore.getInstance();
-
-        toolbar=(MaterialToolbar) rootView.findViewById(R.id.toolbar);
+        noNotes=(TextView)rootView.findViewById(R.id.noNotes);
+        toolbar=(Toolbar) rootView.findViewById(R.id.toolbar);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
 
@@ -94,20 +98,22 @@ public class HomeFragment extends Fragment implements NotesAdapter.NoteListClick
 
     private void setupRecyclerView() {
         collectionReference=firebaseFirestore.collection("notes").document(firebaseUser.getUid()).collection("myNotes");
-        Query query=collectionReference.orderBy("title", Query.Direction.DESCENDING);
+        Query query=collectionReference.orderBy("dateTime", Query.Direction.DESCENDING);
         FirestoreRecyclerOptions<NoteModel> options = new FirestoreRecyclerOptions.Builder<NoteModel>()
                 .setQuery(query, NoteModel.class).build();
         mStaggeredGridLayoutManager= new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(mStaggeredGridLayoutManager);
-        notesAdapter= new NotesAdapter(options,getContext(),this);
+        notesAdapter= new NotesAdapter(options,getContext(),this,this);
         mRecyclerView.setAdapter(notesAdapter);
     }
 
+
     @Override
-    public void onClickItem(String docID, String noteTitle, String noteContent) {
+    public void onClickItem(String dateTime, String docID, String noteTitle, String noteContent) {
 
         Fragment fragment = new EditNoteFragment();
         Bundle result = new Bundle();
+        result.putString("dateTime",dateTime);
         result.putString("docID",docID);
         result.putString("title", noteTitle);
         result.putString("content", noteContent);
@@ -183,5 +189,15 @@ public class HomeFragment extends Fragment implements NotesAdapter.NoteListClick
     public void onResume() {
         super.onResume();
         notesAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void isAdapterEmpty() {
+        if(notesAdapter.getItemCount()==0){
+            noNotes.setVisibility(View.VISIBLE);
+            mRecyclerView.setVisibility(View.GONE);
+        }else {
+            mRecyclerView.setVisibility(View.VISIBLE);
+        }
     }
 }

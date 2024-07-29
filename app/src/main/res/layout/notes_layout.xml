@@ -31,6 +31,8 @@
                     android:paddingBottom="4dp"
                     android:textStyle="bold"
                     android:text="Note Title"
+                    android:maxLines="10"
+                    android:ellipsize="end"
                     android:textSize="16sp"
                     android:layout_weight="1"
                     />
@@ -42,6 +44,8 @@
                 android:id="@+id/note_content"
                 android:paddingHorizontal="10dp"
                 android:paddingBottom="10dp"
+                android:maxLines="10"
+                android:ellipsize="end"
                 android:text="This is a sample text, which will appear in notes"
                 android:textSize="15sp"
                 />

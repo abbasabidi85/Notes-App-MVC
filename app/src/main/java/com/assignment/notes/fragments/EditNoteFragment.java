@@ -7,21 +7,28 @@ import android.os.Bundle;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentResultListener;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.assignment.notes.R;
 import com.assignment.notes.model.SaveNote;
 import com.assignment.notes.model.NoteModel;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -30,11 +37,14 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 
 public class EditNoteFragment extends Fragment implements SaveNote {
-    String docID, noteTitle, noteContent;
+    String docID, formattedDateTime, noteTitle, noteContent;
+    TextView dateTime;
     EditText noteTitleEditText, noteContentEditText;
-    FloatingActionButton saveNoteFAB, deleteNoteFAB;
     FirebaseFirestore firebaseFirestore;
     FirebaseUser firebaseUser;
 
@@ -46,16 +56,18 @@ public class EditNoteFragment extends Fragment implements SaveNote {
         // Inflate the layout for this fragment
         View rootView =inflater.inflate(R.layout.fragment_edit_note, container, false);
 
+        dateTime=rootView.findViewById(R.id.editNoteDateTime);
         noteTitleEditText=(EditText) rootView.findViewById(R.id.editNoteTitle);
         noteContentEditText=(EditText) rootView.findViewById(R.id.editNoteContent);
-        saveNoteFAB=(FloatingActionButton) rootView.findViewById(R.id.editNoteFab);
-        deleteNoteFAB=(FloatingActionButton) rootView.findViewById(R.id.deleteNotefab);
 
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseUser=FirebaseAuth.getInstance().getCurrentUser();
 
-        Toolbar toolbar =rootView.findViewById(R.id.editNoteToolbar);
+        Toolbar toolbar =(Toolbar) rootView.findViewById(R.id.editNoteToolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back);
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
+
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -72,74 +84,18 @@ public class EditNoteFragment extends Fragment implements SaveNote {
         getParentFragmentManager().setFragmentResultListener("noteDetails", this, new FragmentResultListener() {
             @Override
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                formattedDateTime=result.getString("dateTime");
                 docID=result.getString("docID");
                 noteTitle= result.getString("title");
                 noteContent= result.getString("content");
 
+                dateTime.append(formattedDateTime);
                 noteTitleEditText.append(noteTitle);
                 noteContentEditText.append(noteContent);
 
             }
         });
 
-        saveNoteFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                String updatedTitle=noteTitleEditText.getText().toString();
-                String updatedContent=noteContentEditText.getText().toString();
-                if (updatedTitle.equals(noteTitle) && updatedContent.equals(noteContent)){
-                    getFragmentManager().popBackStackImmediate();
-                }else if (updatedTitle.isEmpty()||updatedContent.isEmpty()){
-                    Snackbar.make(getView(),"Empty note discarded", Snackbar.LENGTH_SHORT).show();
-                    getFragmentManager().popBackStackImmediate();
-                }else {
-                    saveNote(docID, updatedTitle, updatedContent);
-                }
-
-
-
-
-            }
-        });
-
-        deleteNoteFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext())
-                        .setTitle("Delete note")
-                        .setMessage("Are you sure you want to delete this note?")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                deleteNote();
-                                dialogInterface.dismiss();
-                            }
-                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                            }
-                        });
-                builder.create();
-                builder.show();
-            }
-
-            private void deleteNote() {
-                DocumentReference documentReference=firebaseFirestore.collection("notes").document(firebaseUser.getUid()).collection("myNotes").document(docID);
-                documentReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                        Snackbar.make(rootView,"Note deleted", Snackbar.LENGTH_SHORT).show();
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Snackbar.make(rootView,"Unable to delete", Snackbar.LENGTH_SHORT).show();
-                    }
-                });
-                getFragmentManager().popBackStackImmediate();
-            }
-        });
 
         return rootView;
     }
@@ -158,7 +114,7 @@ public class EditNoteFragment extends Fragment implements SaveNote {
             public void handleOnBackPressed() {
                 if(noteTitleEditText.getText().toString().equals(noteTitle) && noteContentEditText.getText().toString().equals(noteContent)){
 
-                }else if (noteTitleEditText.getText().toString().isEmpty() || noteContentEditText.getText().toString().isEmpty()){
+                }else if (noteTitleEditText.getText().toString().isEmpty() && noteContentEditText.getText().toString().isEmpty()){
 
                 }else{
                     onBackSaveNote();
@@ -172,34 +128,104 @@ public class EditNoteFragment extends Fragment implements SaveNote {
     }
 
     private void onBackSaveNote() {
+        String updatedDateTime=getTime();
         String updatedTitle=noteTitleEditText.getText().toString();
         String updatedContent=noteContentEditText.getText().toString();
-        saveNote(docID,updatedTitle,updatedContent);
+        saveNote(updatedDateTime,docID,updatedTitle,updatedContent);
+    }
+
+    private String getTime() {
+        String updatedDateTime=null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            LocalDateTime now = LocalDateTime.now();
+            // Define the desired format
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+            // Format the current date and time
+            updatedDateTime = now.format(formatter);
+        }
+        return updatedDateTime;
     }
 
     @Override
-    public void saveNote(String docID, String updatedTitle, String updatedContent) {
+    public void saveNote(String updatedDateTime, String docID, String updatedTitle, String updatedContent) {
         DocumentReference documentReference=firebaseFirestore.collection("notes").document(firebaseUser.getUid()).collection("myNotes").document(docID);
 
-            NoteModel updatedNote = new NoteModel();
-            updatedNote.setTitle(updatedTitle);
-            updatedNote.setContent(updatedContent);
+        NoteModel updatedNote = new NoteModel();
+        updatedNote.setDateTime(updatedDateTime);
+        updatedNote.setTitle(updatedTitle);
+        updatedNote.setContent(updatedContent);
 
-            documentReference.set(updatedNote).addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void unused) {
+        documentReference.set(updatedNote).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
 
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Snackbar.make(getView(),"Something went wrong", Snackbar.LENGTH_SHORT).show();
-                }
-            });
-            getFragmentManager().popBackStackImmediate();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Snackbar.make(getView(),"Something went wrong", Snackbar.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
-    public void uploadNote(String title, String content) {
+    public void uploadNote(String formattedDateTime, String title, String content) {
+    }
+
+    private void deleteNote(){
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext())
+                .setTitle("Delete note")
+                .setMessage("Are you sure you want to delete this note?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        DocumentReference documentReference=firebaseFirestore.collection("notes").document(firebaseUser.getUid()).collection("myNotes").document(docID);
+                        documentReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                getFragmentManager().popBackStackImmediate();
+                                Snackbar.make(getView(),"Note deleted", Snackbar.LENGTH_SHORT).show();
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Snackbar.make(getView(),"Unable to delete", Snackbar.LENGTH_SHORT).show();
+                            }
+                        });
+                        dialogInterface.dismiss();
+                    }
+                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                    }
+                });
+        builder.create();
+        builder.show();
+
+    }
+    
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // TODO Add your menu entries here
+        MenuInflater menuInflater = getActivity().getMenuInflater();
+        menuInflater.inflate(R.menu.delete_action_button, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int res_id= item.getItemId();
+
+        if (res_id==R.id.action_delete){
+            deleteNote();
+        }
+        return true;
     }
 }

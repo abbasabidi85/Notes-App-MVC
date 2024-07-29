@@ -10,6 +10,7 @@ import java.io.Serializable;
 public class NoteModel {
 
 
+    private String dateTime;
     private String title;
 
     private String content;
@@ -18,11 +19,20 @@ public class NoteModel {
 
     }
 
-    public NoteModel(String title, String content){
+    public NoteModel(String dateTime, String title, String content){
+
+        this.dateTime=dateTime;
         this.title=title;
         this.content=content;
     }
 
+    public String getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(String dateTime) {
+        this.dateTime = dateTime;
+    }
     public String getTitle() {
         return title;
     }

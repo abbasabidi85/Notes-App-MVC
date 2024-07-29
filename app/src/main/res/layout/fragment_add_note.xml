@@ -4,50 +4,60 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".fragments.AddNoteFragment">
-
-
-        <androidx.appcompat.widget.Toolbar
+    tools:context=".fragments.AddNoteFragment"
+    android:fitsSystemWindows="true">
+        <com.google.android.material.appbar.MaterialToolbar
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:layout_constraintTop_toTopOf="parent"
             android:id="@+id/addNoteToolbar">
-        </androidx.appcompat.widget.Toolbar>
 
-        <EditText
+                <TextView
+                    android:id="@+id/addNoteDateTime"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="29/07/2024 12:25"/>
+        </com.google.android.material.appbar.MaterialToolbar>
+   <ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.AddNoteFragment"
+       android:layout_below="@id/addNoteToolbar"
+    android:scrollbars="none">
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:background="@null"
-            android:paddingTop="20dp"
-            android:paddingBottom="8dp"
-            android:paddingHorizontal="18dp"
-            android:maxLines="1"
-            android:inputType="text"
-            android:layout_below="@id/addNoteToolbar"
-            android:hint="Title"
-            android:id="@+id/addNoteTitle"/>
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="top|start"
-            android:hint="Note"
-            android:textSize="15sp"
-            android:paddingHorizontal="18dp"
-            android:background="@null"
-            android:layout_below="@id/addNoteTitle"
-            android:id="@+id/addNoteContent"/>
+            android:orientation="vertical">
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                        <EditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:background="@null"
+                            android:paddingTop="20dp"
+                            android:paddingBottom="8dp"
+                            android:paddingHorizontal="18dp"
+                            android:inputType="textMultiLine"
+                            android:singleLine="false"
+                            android:gravity="top|start"
+                            android:hint="Title"
+                            android:id="@+id/addNoteTitle"/>
+                        <EditText
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="top|start"
+                            android:hint="Note"
+                            android:textSize="15sp"
+                            android:inputType="textMultiLine"
+                            android:paddingHorizontal="18dp"
+                            android:background="@null"
+                            android:layout_below="@id/addNoteTitle"
+                            android:id="@+id/addNoteContent"/>
+                </RelativeLayout>
+        </LinearLayout>
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginVertical="20dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:src="@drawable/ic_done"
-            android:id="@+id/addNotFab"/>
-    </RelativeLayout>
+    </ScrollView>
+</RelativeLayout>
