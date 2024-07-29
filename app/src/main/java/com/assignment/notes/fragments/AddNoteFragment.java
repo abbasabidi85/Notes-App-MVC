@@ -124,14 +124,6 @@ public class AddNoteFragment extends Fragment implements SaveNote {
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), callback);
     }
 
-
-
-
-
-
-
-
-
     @Override
     public void uploadNote(String formattedDateTime, String title, String content) {
 
@@ -164,5 +156,6 @@ public class AddNoteFragment extends Fragment implements SaveNote {
     public void saveNote(String updatedDateTime, String docID, String title, String content) {
 
     }
+
 }
 
