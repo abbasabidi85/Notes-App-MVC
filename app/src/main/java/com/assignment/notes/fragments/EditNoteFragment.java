@@ -184,8 +184,8 @@ public class EditNoteFragment extends Fragment implements SaveNote {
                         documentReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
-                                getFragmentManager().popBackStackImmediate();
                                 Snackbar.make(getView(),"Note deleted", Snackbar.LENGTH_SHORT).show();
+                                getFragmentManager().popBackStackImmediate();
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override

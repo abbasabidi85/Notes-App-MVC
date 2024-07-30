@@ -32,8 +32,18 @@ public class NotesAdapter extends FirestoreRecyclerAdapter<NoteModel, NotesAdapt
 
         String docID=this.getSnapshots().getSnapshot(position).getId();
         String dateTime=this.getSnapshots().getSnapshot(position).getString("dateTime");
-        holder.noteTitle.setText(noteModel.getTitle());
-        holder.noteContent.setText(noteModel.getContent());
+        if (noteModel.getTitle().isEmpty()){
+            holder.noteTitle.setVisibility(View.GONE);
+            holder.noteContent.setText(noteModel.getContent());
+        }else if(noteModel.getContent().isEmpty()){
+            holder.noteTitle.setText(noteModel.getTitle());
+            holder.noteContent.setVisibility(View.GONE);
+        }else{
+            holder.noteTitle.setText(noteModel.getTitle());
+            holder.noteContent.setText(noteModel.getContent());
+        }
+
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
