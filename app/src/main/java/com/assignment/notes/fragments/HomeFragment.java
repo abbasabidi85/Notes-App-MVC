@@ -18,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +40,7 @@ public class HomeFragment extends Fragment implements NotesAdapter.NoteListClick
     FloatingActionButton fabAdd;
 
     TextView noNotes;
+    ImageView noNotesImg;
     RecyclerView mRecyclerView;
     StaggeredGridLayoutManager mStaggeredGridLayoutManager;
     NotesAdapter notesAdapter;
@@ -57,6 +59,7 @@ public class HomeFragment extends Fragment implements NotesAdapter.NoteListClick
         firebaseUser=FirebaseAuth.getInstance().getCurrentUser();
         firebaseFirestore=FirebaseFirestore.getInstance();
         noNotes=(TextView)rootView.findViewById(R.id.noNotes);
+        noNotesImg=(ImageView)rootView.findViewById(R.id.noNotesImg);
         toolbar=(Toolbar) rootView.findViewById(R.id.toolbar);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -98,7 +101,7 @@ public class HomeFragment extends Fragment implements NotesAdapter.NoteListClick
 
     private void setupRecyclerView() {
         collectionReference=firebaseFirestore.collection("notes").document(firebaseUser.getUid()).collection("myNotes");
-        Query query=collectionReference.orderBy("dateTime", Query.Direction.DESCENDING);
+        Query query=collectionReference.orderBy("timeStamp", Query.Direction.DESCENDING);
         FirestoreRecyclerOptions<NoteModel> options = new FirestoreRecyclerOptions.Builder<NoteModel>()
                 .setQuery(query, NoteModel.class).build();
         mStaggeredGridLayoutManager= new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
@@ -194,6 +197,7 @@ public class HomeFragment extends Fragment implements NotesAdapter.NoteListClick
     @Override
     public void isAdapterEmpty() {
         if(notesAdapter.getItemCount()==0){
+            noNotesImg.setVisibility(View.VISIBLE);
             noNotes.setVisibility(View.VISIBLE);
             mRecyclerView.setVisibility(View.GONE);
         }else {

@@ -25,17 +25,20 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class AddNoteFragment extends Fragment implements SaveNote {
 
-    String formattedDateTime;
+    String formattedDateTime, serverTimeStamp;
     TextView dateTime;
     EditText mNoteTitle, mNoteContent;
     FloatingActionButton fabUploadNote;
@@ -84,11 +87,10 @@ public class AddNoteFragment extends Fragment implements SaveNote {
             }
         }); */
 
-
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             LocalDateTime now = LocalDateTime.now();
             // Define the desired format
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy hh:mm a");
 
             // Format the current date and time
             formattedDateTime = now.format(formatter);

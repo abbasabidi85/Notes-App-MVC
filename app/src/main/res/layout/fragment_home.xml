@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.HomeFragment">
+    tools:context=".fragments.HomeFragment"
+    android:fitsSystemWindows="true">
 
     <!-- TODO: Update blank fragment layout -->
 
@@ -24,6 +25,15 @@
             app:title="@string/app_name">
         </com.google.android.material.appbar.MaterialToolbar>
 
+        <ImageView
+            android:id="@+id/noNotesImg"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_empty"
+            app:layout_constraintBottom_toTopOf="@+id/noNotes"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
         <TextView
             android:id="@+id/noNotes"
             android:visibility="gone"

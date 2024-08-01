@@ -5,7 +5,12 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.ServerTimestamp;
+
 import java.io.Serializable;
+import java.sql.Time;
+import java.util.Date;
 
 public class NoteModel {
 
@@ -15,15 +20,19 @@ public class NoteModel {
 
     private String content;
 
+    @ServerTimestamp
+    private Timestamp timeStamp;
+
     public NoteModel(){
 
     }
 
-    public NoteModel(String dateTime, String title, String content){
+    public NoteModel(String dateTime, String title, String content, Timestamp timeStamp){
 
         this.dateTime=dateTime;
         this.title=title;
         this.content=content;
+        this.timeStamp=timeStamp;
     }
 
     public String getDateTime() {
@@ -47,6 +56,14 @@ public class NoteModel {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public Timestamp getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(Timestamp timeStamp) {
+        this.timeStamp = timeStamp;
     }
 }
 
