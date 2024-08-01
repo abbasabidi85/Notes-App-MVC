@@ -1,12 +1,11 @@
+Basic note-taking app based on Single Activity multiple Fragments with cloud synchronization, allowing users to Create, Read, Update and Delete notes, the user can access their notes on multiple devices by signing in with their Google account.
+
+Implemented MVC Architecture, Material You design system, Activity Lifecycle, Fragments, RecyclerViews, FirestoreRecyclerAdapter, Cloud Firestore and Google SignIn API
+
 App Screenshots
 
-![Notes App Screenshot-100](https://github.com/abbasabidi85/Notes_App/assets/75479506/5087a025-5bc8-4ed6-b66d-60dadc583d7d)
+![20240731_190142_0000](https://github.com/user-attachments/assets/ac628c8b-f48a-4469-82b4-c89be4c5d013) 
 
-Basic note-taking app based on Single Activity multiple Fragments with cloud synchronization, allowing users to access their notes on multiple devices by signing in with their Google account.
+![20240731_190608_0001](https://github.com/user-attachments/assets/d63de1b7-2e04-4dfc-a829-13f39f971378)
 
-Tech Stack: 
-Java, 
-Material You, 
-Google SignIn API, 
-Cloud Firestore, 
-MVC Architecture 
+
