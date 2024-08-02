@@ -107,9 +107,7 @@ public class HomeFragment extends Fragment implements NotesAdapter.NoteListClick
                 .setQuery(query, NoteModel.class).build();
         mStaggeredGridLayoutManager= new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(mStaggeredGridLayoutManager);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notesAdapter= new NotesAdapter(options,getContext(),this,this);
-        }
+        notesAdapter= new NotesAdapter(options,getContext(),this,this);
         mRecyclerView.setAdapter(notesAdapter);
     }
 

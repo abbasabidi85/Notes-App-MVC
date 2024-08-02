@@ -105,7 +105,6 @@ public class EditNoteFragment extends Fragment implements SaveNote {
         imm.hideSoftInputFromWindow(noteContentEditText.getWindowToken(), 0);
     }
     //save note on pressing back button
-    @RequiresApi(Build.VERSION_CODES.O)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -127,7 +126,6 @@ public class EditNoteFragment extends Fragment implements SaveNote {
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), callback);
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private void onBackSaveNote() {
         String updatedDateTime=getTime();
         String updatedTitle=noteTitleEditText.getText().toString();

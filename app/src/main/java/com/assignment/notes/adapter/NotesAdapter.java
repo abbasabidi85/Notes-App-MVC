@@ -18,7 +18,6 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 
 import java.nio.charset.StandardCharsets;
 
-@RequiresApi(Build.VERSION_CODES.O)
 public class NotesAdapter extends FirestoreRecyclerAdapter<NoteModel, NotesAdapter.NotesViewHolder> {
 
     Context context;

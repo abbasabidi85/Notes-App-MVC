@@ -107,7 +107,6 @@ public class AddNoteFragment extends Fragment implements SaveNote {
     }
 
     //save note on pressing back button
-    @RequiresApi(Build.VERSION_CODES.O)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
