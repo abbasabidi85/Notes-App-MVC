@@ -6,6 +6,3 @@ App Screenshots
 
 ![20240731_190142_0000](https://github.com/user-attachments/assets/ac628c8b-f48a-4469-82b4-c89be4c5d013) 
 
-![20240731_190608_0001](https://github.com/user-attachments/assets/d63de1b7-2e04-4dfc-a829-13f39f971378)
-
-
