@@ -40,7 +40,7 @@ import java.time.format.DateTimeFormatter;
 
 public class AddNoteFragment extends Fragment implements SaveNote {
 
-    String formattedDateTime, serverTimeStamp;
+    String formattedDateTime;
     TextView dateTime;
     EditText mNoteTitle, mNoteContent;
     FloatingActionButton fabUploadNote;
@@ -77,18 +77,6 @@ public class AddNoteFragment extends Fragment implements SaveNote {
                 getActivity().onBackPressed();
             }
         });
-
-        /* fabUploadNote.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                String title = mNoteTitle.getText().toString();
-                String content=mNoteContent.getText().toString();
-
-                uploadNote(title, content);
-
-            }
-        }); */
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             LocalDateTime now = LocalDateTime.now();

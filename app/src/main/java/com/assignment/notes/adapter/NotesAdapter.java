@@ -64,33 +64,6 @@ public class NotesAdapter extends FirestoreRecyclerAdapter<NoteModel, NotesAdapt
         return new NotesViewHolder(view);
     }
 
-    /*
-
-    @NonNull
-    @Override
-    public NotesAdapter.NotesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view= LayoutInflater.from(context).inflate(R.layout.notes_layout ,parent,false);
-        return new NotesViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull NotesAdapter.NotesViewHolder holder, int position) {
-        NoteModel noteModel=notesList.get(position);
-
-        holder.noteTitle.setText(noteModel.getTitle());
-        holder.noteContent.setText(noteModel.getContent());
-
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-            }
-        });
-    }
-
-    @Override
-    public int getItemCount() {
-        return notesList.size();
-    }*/
 
     public static class NotesViewHolder extends RecyclerView.ViewHolder{
 
