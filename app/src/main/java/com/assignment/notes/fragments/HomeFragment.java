@@ -1,6 +1,7 @@
 package com.assignment.notes.fragments;
 
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -106,7 +107,9 @@ public class HomeFragment extends Fragment implements NotesAdapter.NoteListClick
                 .setQuery(query, NoteModel.class).build();
         mStaggeredGridLayoutManager= new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(mStaggeredGridLayoutManager);
-        notesAdapter= new NotesAdapter(options,getContext(),this,this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notesAdapter= new NotesAdapter(options,getContext(),this,this);
+        }
         mRecyclerView.setAdapter(notesAdapter);
     }
 

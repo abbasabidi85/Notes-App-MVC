@@ -2,16 +2,17 @@ package com.assignment.notes.fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentResultListener;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,14 +29,11 @@ import com.assignment.notes.model.SaveNote;
 import com.assignment.notes.model.NoteModel;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.time.LocalDateTime;
@@ -107,6 +105,7 @@ public class EditNoteFragment extends Fragment implements SaveNote {
         imm.hideSoftInputFromWindow(noteContentEditText.getWindowToken(), 0);
     }
     //save note on pressing back button
+    @RequiresApi(Build.VERSION_CODES.O)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -128,6 +127,7 @@ public class EditNoteFragment extends Fragment implements SaveNote {
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), callback);
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private void onBackSaveNote() {
         String updatedDateTime=getTime();
         String updatedTitle=noteTitleEditText.getText().toString();

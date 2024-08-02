@@ -1,11 +1,13 @@
 package com.assignment.notes.fragments;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -51,6 +53,7 @@ public class AddNoteFragment extends Fragment implements SaveNote {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_add_note, container, false);
+
 
         dateTime=rootView.findViewById(R.id.addNoteDateTime);
         mNoteTitle=rootView.findViewById(R.id.addNoteTitle);
@@ -104,12 +107,14 @@ public class AddNoteFragment extends Fragment implements SaveNote {
     }
 
     //save note on pressing back button
+    @RequiresApi(Build.VERSION_CODES.O)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
+
                 if (mNoteTitle.getText().toString().isEmpty() && mNoteContent.getText().toString().isEmpty()){
                     Snackbar.make(getView(),"Empty note discarded",Snackbar.LENGTH_SHORT).show();
                 }else {

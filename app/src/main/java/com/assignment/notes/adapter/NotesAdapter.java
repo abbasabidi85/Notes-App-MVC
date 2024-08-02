@@ -1,12 +1,14 @@
 package com.assignment.notes.adapter;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.assignment.notes.R;
@@ -14,6 +16,9 @@ import com.assignment.notes.model.NoteModel;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 
+import java.nio.charset.StandardCharsets;
+
+@RequiresApi(Build.VERSION_CODES.O)
 public class NotesAdapter extends FirestoreRecyclerAdapter<NoteModel, NotesAdapter.NotesViewHolder> {
 
     Context context;
@@ -32,6 +37,7 @@ public class NotesAdapter extends FirestoreRecyclerAdapter<NoteModel, NotesAdapt
 
         String docID=this.getSnapshots().getSnapshot(position).getId();
         String dateTime=this.getSnapshots().getSnapshot(position).getString("dateTime");
+
         if (noteModel.getTitle().isEmpty()){
             holder.noteTitle.setVisibility(View.GONE);
             holder.noteContent.setText(noteModel.getContent());
