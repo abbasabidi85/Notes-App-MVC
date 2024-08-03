@@ -48,6 +48,8 @@
                android:layout_height="match_parent"
                android:gravity="top|start"
                android:hint="Note"
+               android:focusable="true"
+               android:focusableInTouchMode="true"
                android:textSize="15sp"
                android:inputType="textMultiLine"
                android:paddingHorizontal="18dp"

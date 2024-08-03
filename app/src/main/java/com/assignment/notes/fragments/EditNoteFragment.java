@@ -74,9 +74,6 @@ public class EditNoteFragment extends Fragment implements SaveNote {
             }
         });
 
-        noteContentEditText.requestFocus();
-        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
 
         //get data from home fragment
@@ -91,19 +88,14 @@ public class EditNoteFragment extends Fragment implements SaveNote {
                 dateTime.append(formattedDateTime);
                 noteTitleEditText.append(noteTitle);
                 noteContentEditText.append(noteContent);
-
             }
         });
 
 
+
         return rootView;
     }
-    @Override
-    public void onPause() {
-        super.onPause();
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(noteContentEditText.getWindowToken(), 0);
-    }
+
     //save note on pressing back button
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {

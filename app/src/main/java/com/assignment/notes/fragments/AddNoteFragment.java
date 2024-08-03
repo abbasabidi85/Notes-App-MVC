@@ -64,11 +64,6 @@ public class AddNoteFragment extends Fragment implements SaveNote {
         db=FirebaseFirestore.getInstance();
         firebaseUser=firebaseAuth.getCurrentUser();
 
-        mNoteTitle.requestFocus();
-        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_IMPLICIT_ONLY);
-
-
         Toolbar toolbar =(Toolbar) rootView.findViewById(R.id.addNoteToolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -98,6 +93,11 @@ public class AddNoteFragment extends Fragment implements SaveNote {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        mNoteContent.requestFocus();
+        InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(mNoteContent, InputMethodManager.SHOW_IMPLICIT);
+
         OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
